@@ -17,11 +17,15 @@ import { useEnrollFace } from "@/hooks/useFaces"
 
 interface EnrollDialogProps {
   device_id: string
+  enrollUsername?: string
 }
 
-export default function EnrollDialog({ device_id }: EnrollDialogProps) {
+export default function EnrollDialog({
+  device_id,
+  enrollUsername,
+}: EnrollDialogProps) {
   const [open, setOpen] = useState(false)
-  const [username, setUsername] = useState("")
+  const [username, setUsername] = useState(enrollUsername || "")
   const [preview, setPreview] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const enrollMutation = useEnrollFace(device_id)

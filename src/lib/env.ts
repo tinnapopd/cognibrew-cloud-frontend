@@ -18,12 +18,16 @@ declare global {
 
 function getEnv(key: keyof RuntimeEnv): string {
   // 1. Runtime injection (K8s / Docker)
-  const runtime = window.__ENV__?.[key]
-  if (runtime) return runtime
+  // Ensure we accept explicit empty strings ("") without falling back
+  if (typeof window !== "undefined" && typeof window.__ENV__ !== "undefined") {
+    if (typeof window.__ENV__[key] === "string") {
+      return window.__ENV__[key]
+    }
+  }
 
   // 2. Vite build-time fallback (dev server)
   const buildTime = import.meta.env[key] as string | undefined
-  if (buildTime) return buildTime
+  if (typeof buildTime === "string") return buildTime
 
   // 3. Empty string — will use relative URLs / Vite proxy
   return ""

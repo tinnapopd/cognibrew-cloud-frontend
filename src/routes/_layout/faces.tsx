@@ -6,36 +6,40 @@ import FaceCard from "@/components/Faces/FaceCard"
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useDeleteFace, useGetFacesByDevice } from "@/hooks/useFaces"
+import { useDeleteFace, useGetFaces } from "@/hooks/useFaces"
 
 interface FacesSearch {
-  device_id: string
+  username: string
+  device_id?: string
 }
 
 export const Route = createFileRoute("/_layout/faces")({
   validateSearch: (search: Record<string, unknown>): FacesSearch => ({
-    device_id: (search.device_id as string) || "",
+    username: (search.username as string) || "",
+    device_id: (search.device_id as string) || undefined,
   }),
   component: FacesPage,
 })
 
 function FacesPage() {
-  const { device_id } = Route.useSearch()
+  const { username, device_id } = Route.useSearch()
   const navigate = useNavigate()
-  const { data, isLoading, isError, error, refetch, isFetching } =
-    useGetFacesByDevice(device_id)
-  const deleteMutation = useDeleteFace(undefined, device_id)
+  const { data, isLoading, isError, error, refetch, isFetching } = useGetFaces(
+    username,
+    device_id,
+  )
+  const deleteMutation = useDeleteFace(username, device_id)
 
-  if (!device_id) {
+  if (!username) {
     navigate({ to: "/" })
     return null
   }
 
-  const handleDelete = async (username: string) => {
+  const handleDelete = async (targetUsername: string) => {
     try {
-      await deleteMutation.mutateAsync(username)
+      await deleteMutation.mutateAsync(targetUsername)
       toast.success("Face deleted", {
-        description: `Removed face for ${username} from device ${device_id}`,
+        description: `Removed face for ${targetUsername}${device_id ? ` from device ${device_id}` : ""}`,
       })
     } catch (err) {
       toast.error("Delete failed", {
@@ -62,12 +66,12 @@ function FacesPage() {
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold tracking-tight">
               <Cpu className="h-6 w-6 text-primary" />
-              {device_id}
+              {username}
             </h1>
             <p className="text-sm text-muted-foreground">
               {isLoading
-                ? "Loading face records…"
-                : `${faces.length} face${faces.length !== 1 ? "s" : ""} enrolled`}
+                ? "Loading face records..."
+                : `${faces.length} face${faces.length === 1 ? "" : "s"} enrolled`}
             </p>
           </div>
         </div>
@@ -85,7 +89,10 @@ function FacesPage() {
             />
             Refresh
           </Button>
-          <EnrollDialog device_id={device_id} />
+          <EnrollDialog
+            device_id={device_id || "manual"}
+            enrollUsername={username}
+          />
         </div>
       </div>
 
@@ -117,7 +124,7 @@ function FacesPage() {
         </div>
       )}
 
-      {/* Empty state — no faces found, ask to create */}
+      {/* Empty State */}
       {!isLoading && !isError && faces.length === 0 && (
         <div className="flex flex-col items-center gap-5 py-16 text-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted">
@@ -125,21 +132,26 @@ function FacesPage() {
           </div>
           <div>
             <p className="text-lg font-medium">
-              No faces found on device{" "}
-              <span className="text-primary">{device_id}</span>
+              No faces found for{" "}
+              <span className="text-primary">{username}</span>
+              {device_id && ` on device ${device_id}`}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              Would you like to enroll a new face for this device?
+              Would you like to enroll a new face?
             </p>
           </div>
-          <EnrollDialog device_id={device_id} />
+          {/* Default to the chosen device_id or 'manual' */}
+          <EnrollDialog
+            device_id={device_id || "manual"}
+            enrollUsername={username}
+          />
         </div>
       )}
 
-      {/* Grid of face cards */}
+      {/* Grid */}
       {!isLoading && faces.length > 0 && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {faces.map((face) => (
+          {faces.map((face: any) => (
             <FaceCard
               key={`${face.username}-${face.device_id}-${face.s3_key}`}
               face={face}
