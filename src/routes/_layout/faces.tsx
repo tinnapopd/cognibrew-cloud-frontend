@@ -89,10 +89,7 @@ function FacesPage() {
             />
             Refresh
           </Button>
-          <EnrollDialog
-            device_id={device_id}
-            enrollUsername={username}
-          />
+          <EnrollDialog device_id={device_id} enrollUsername={username} />
         </div>
       </div>
 
@@ -141,10 +138,7 @@ function FacesPage() {
             </p>
           </div>
           {/* Default to the chosen device_id */}
-          <EnrollDialog
-            device_id={device_id}
-            enrollUsername={username}
-          />
+          <EnrollDialog device_id={device_id} enrollUsername={username} />
         </div>
       )}
 

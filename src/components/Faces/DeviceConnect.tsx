@@ -37,8 +37,8 @@ export default function DeviceConnect() {
           Cognibrew Edge
         </h1>
         <p className="max-w-sm text-muted-foreground">
-          Face Recognition Management Console — Enter a Username and Device ID to view &amp;
-          manage enrolled faces.
+          Face Recognition Management Console — Enter a Username and Device ID
+          to view &amp; manage enrolled faces.
         </p>
       </div>
 

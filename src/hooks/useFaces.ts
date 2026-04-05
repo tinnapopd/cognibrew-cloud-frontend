@@ -61,8 +61,7 @@ export function useDeleteFace(username: string, device_id: string) {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: (s3_key: string) =>
-      deleteFace({ username, device_id, s3_key }),
+    mutationFn: (s3_key: string) => deleteFace({ username, device_id, s3_key }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["faces-by-device", device_id] })
       qc.invalidateQueries({ queryKey: ["faces", username] })
