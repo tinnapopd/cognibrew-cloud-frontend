@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="cup" x1="8" y1="12" x2="36" y2="44" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e"/>
+      <stop offset="1" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="steam" x1="16" y1="0" x2="16" y2="14" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22c55e" stop-opacity="0"/>
+      <stop offset="1" stop-color="#22c55e" stop-opacity=".6"/>
+    </linearGradient>
+  </defs>
+  <!-- Steam lines -->
+  <path d="M16 14c0-3 2-4 2-7s-2-4-2-7" stroke="url(#steam)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M24 14c0-3 2-4 2-7s-2-4-2-7" stroke="url(#steam)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <path d="M32 14c0-3 2-4 2-7s-2-4-2-7" stroke="url(#steam)" stroke-width="2" stroke-linecap="round" fill="none"/>
+  <!-- Cup body -->
+  <rect x="8" y="16" width="28" height="24" rx="4" fill="url(#cup)"/>
+  <!-- Cup handle -->
+  <path d="M36 22h3a5 5 0 0 1 0 10h-3" stroke="url(#cup)" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- Cup shine -->
+  <rect x="13" y="21" width="3" height="10" rx="1.5" fill="white" opacity=".25"/>
+  <!-- Saucer -->
+  <ellipse cx="24" cy="44" rx="16" ry="3" fill="#15803d" opacity=".3"/>
+</svg>
