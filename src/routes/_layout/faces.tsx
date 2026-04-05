@@ -1,21 +1,15 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useGetFacesByDevice, useDeleteFace } from "@/hooks/useFaces";
-import FaceCard from "@/components/Faces/FaceCard";
-import EnrollDialog from "@/components/Faces/EnrollDialog";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import {
-  ArrowLeft,
-  RefreshCw,
-  Cpu,
-  AlertCircle,
-  UserPlus,
-} from "lucide-react";
-import { toast } from "sonner";
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
+import { AlertCircle, ArrowLeft, Cpu, RefreshCw, UserPlus } from "lucide-react"
+import { toast } from "sonner"
+import EnrollDialog from "@/components/Faces/EnrollDialog"
+import FaceCard from "@/components/Faces/FaceCard"
+import { Button } from "@/components/ui/button"
+import { Separator } from "@/components/ui/separator"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useDeleteFace, useGetFacesByDevice } from "@/hooks/useFaces"
 
 interface FacesSearch {
-  device_id: string;
+  device_id: string
 }
 
 export const Route = createFileRoute("/_layout/faces")({
@@ -23,34 +17,34 @@ export const Route = createFileRoute("/_layout/faces")({
     device_id: (search.device_id as string) || "",
   }),
   component: FacesPage,
-});
+})
 
 function FacesPage() {
-  const { device_id } = Route.useSearch();
-  const navigate = useNavigate();
+  const { device_id } = Route.useSearch()
+  const navigate = useNavigate()
   const { data, isLoading, isError, error, refetch, isFetching } =
-    useGetFacesByDevice(device_id);
-  const deleteMutation = useDeleteFace(undefined, device_id);
+    useGetFacesByDevice(device_id)
+  const deleteMutation = useDeleteFace(undefined, device_id)
 
   if (!device_id) {
-    navigate({ to: "/" });
-    return null;
+    navigate({ to: "/" })
+    return null
   }
 
   const handleDelete = async (username: string) => {
     try {
-      await deleteMutation.mutateAsync(username);
+      await deleteMutation.mutateAsync(username)
       toast.success("Face deleted", {
         description: `Removed face for ${username} from device ${device_id}`,
-      });
+      })
     } catch (err) {
       toast.error("Delete failed", {
         description: err instanceof Error ? err.message : "Unknown error",
-      });
+      })
     }
-  };
+  }
 
-  const faces = data?.faces ?? [];
+  const faces = data?.faces ?? []
 
   return (
     <div className="space-y-6">
@@ -156,5 +150,5 @@ function FacesPage() {
         </div>
       )}
     </div>
-  );
+  )
 }

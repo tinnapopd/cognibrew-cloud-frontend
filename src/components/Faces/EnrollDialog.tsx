@@ -1,4 +1,7 @@
-import { useRef, useState } from "react";
+import { ImagePlus, Loader2, Plus, Upload } from "lucide-react"
+import { useRef, useState } from "react"
+import { toast } from "sonner"
+import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
@@ -7,68 +10,65 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Plus, Upload, Loader2, ImagePlus } from "lucide-react";
-import { useEnrollFace } from "@/hooks/useFaces";
-import { toast } from "sonner";
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { useEnrollFace } from "@/hooks/useFaces"
 
 interface EnrollDialogProps {
-  device_id: string;
+  device_id: string
 }
 
 export default function EnrollDialog({ device_id }: EnrollDialogProps) {
-  const [open, setOpen] = useState(false);
-  const [username, setUsername] = useState("");
-  const [preview, setPreview] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
-  const enrollMutation = useEnrollFace(device_id);
+  const [open, setOpen] = useState(false)
+  const [username, setUsername] = useState("")
+  const [preview, setPreview] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement>(null)
+  const enrollMutation = useEnrollFace(device_id)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const file = e.target.files?.[0]
     if (file) {
-      setPreview(URL.createObjectURL(file));
+      setPreview(URL.createObjectURL(file))
     } else {
-      setPreview(null);
+      setPreview(null)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    const file = fileRef.current?.files?.[0];
-    if (!file || !username.trim()) return;
+    e.preventDefault()
+    const file = fileRef.current?.files?.[0]
+    if (!file || !username.trim()) return
 
     try {
       await enrollMutation.mutateAsync({
         file,
         enrollUsername: username.trim(),
-      });
+      })
       toast.success("Face enrolled", {
         description: `Successfully enrolled face for ${username.trim()} on device ${device_id}`,
-      });
-      setOpen(false);
-      resetForm();
+      })
+      setOpen(false)
+      resetForm()
     } catch (err) {
       toast.error("Enrollment failed", {
         description: err instanceof Error ? err.message : "Unknown error",
-      });
+      })
     }
-  };
+  }
 
   const resetForm = () => {
-    setUsername("");
-    setPreview(null);
-    if (fileRef.current) fileRef.current.value = "";
-  };
+    setUsername("")
+    setPreview(null)
+    if (fileRef.current) fileRef.current.value = ""
+  }
 
   return (
     <Dialog
       open={open}
       onOpenChange={(v) => {
-        setOpen(v);
-        if (!v) resetForm();
+        setOpen(v)
+        if (!v) resetForm()
       }}
     >
       <DialogTrigger asChild>
@@ -156,5 +156,5 @@ export default function EnrollDialog({ device_id }: EnrollDialogProps) {
         </form>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

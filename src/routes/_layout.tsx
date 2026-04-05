@@ -1,9 +1,9 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { Toaster } from "@/components/ui/sonner";
+import { createFileRoute, Outlet } from "@tanstack/react-router"
+import { Toaster } from "@/components/ui/sonner"
 
 export const Route = createFileRoute("/_layout")({
   component: LayoutComponent,
-});
+})
 
 function LayoutComponent() {
   return (
@@ -13,5 +13,5 @@ function LayoutComponent() {
       </main>
       <Toaster richColors position="bottom-right" />
     </div>
-  );
+  )
 }

@@ -1,461 +1,426 @@
 {
-    "openapi": "3.1.0",
-    "info": {
-        "title": "CogniBrew Edge Gateway",
-        "description": "Receives daily batch vectors from Edge. Validates payload schema. Stores raw data to S3.",
-        "version": "0.1.0"
-    },
-    "paths": {
-        "/api/v1/gateway/create_faces": {
-            "post": {
-                "tags": [
-                    "gateway"
-                ],
-                "summary": "Create Faces",
-                "description": "Create (enroll) a baseline face-embedding vector.\n\nStores under ``/enrollments/{username}/{device_id}.json``.",
-                "operationId": "gateway-create_faces",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CreateFacesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UploadResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
+  "openapi": "3.1.0",
+  "info": {
+    "title": "CogniBrew Edge Gateway",
+    "description": "Receives daily batch vectors from Edge. Validates payload schema. Stores raw data to S3.",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/gateway/create_faces": {
+      "post": {
+        "tags": ["gateway"],
+        "summary": "Create Faces",
+        "description": "Create (enroll) a baseline face-embedding vector.\n\nStores under ``/enrollments/{username}/{device_id}.json``.",
+        "operationId": "gateway-create_faces",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFacesRequest"
+              }
             }
+          },
+          "required": true
         },
-        "/api/v1/gateway/get_faces": {
-            "post": {
-                "tags": [
-                    "gateway"
-                ],
-                "summary": "Get Faces",
-                "description": "Retrieve enrolled face records for a given username.\n\nIf ``device_id`` is provided, only that specific record is returned.\nOtherwise **all** face records for the user are returned.",
-                "operationId": "gateway-get_faces",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/GetFacesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/GetFacesResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResponse"
                 }
+              }
             }
-        },
-        "/api/v1/gateway/delete_faces": {
-            "post": {
-                "tags": [
-                    "gateway"
-                ],
-                "summary": "Delete Faces",
-                "description": "Delete enrolled face records for a user.\n\nIf ``device_id`` is provided, only that specific record is deleted.\nOtherwise **all** face records for the user are removed.",
-                "operationId": "gateway-delete_faces",
-                "requestBody": {
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/DeleteFacesRequest"
-                            }
-                        }
-                    },
-                    "required": true
-                },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/DeleteFacesResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
             }
-        },
-        "/api/v1/utils/health-check/": {
-            "get": {
-                "tags": [
-                    "utils"
-                ],
-                "summary": "Health Check",
-                "operationId": "utils-health_check",
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "boolean",
-                                    "title": "Response Utils-Health Check"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+          }
         }
+      }
     },
-    "components": {
-        "schemas": {
-            "BatchUpload": {
-                "properties": {
-                    "device_id": {
-                        "type": "string",
-                        "title": "Device Id",
-                        "description": "Unique edge device identifier"
-                    },
-                    "date": {
-                        "type": "string",
-                        "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
-                        "title": "Date",
-                        "description": "ISO-8601 date string (YYYY-MM-DD)"
-                    },
-                    "vectors": {
-                        "items": {
-                            "$ref": "#/components/schemas/VectorRecord"
-                        },
-                        "type": "array",
-                        "minItems": 1,
-                        "title": "Vectors",
-                        "description": "Batch of face-embedding records"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "device_id",
-                    "date",
-                    "vectors"
-                ],
-                "title": "BatchUpload",
-                "description": "Daily batch payload sent from an Edge device."
-            },
-            "CreateFacesRequest": {
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "title": "Username"
-                    },
-                    "embedding": {
-                        "items": {
-                            "type": "number"
-                        },
-                        "type": "array",
-                        "maxItems": 512,
-                        "minItems": 512,
-                        "title": "Embedding"
-                    },
-                    "device_id": {
-                        "type": "string",
-                        "title": "Device Id",
-                        "description": "Source device or 'manual'",
-                        "default": "manual"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "username",
-                    "embedding"
-                ],
-                "title": "CreateFacesRequest",
-                "description": "Request to create (enroll) a baseline face vector."
-            },
-            "DeleteFacesRequest": {
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "title": "Username",
-                        "description": "Username whose faces to delete"
-                    },
-                    "device_id": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Device Id",
-                        "description": "Specific device_id to delete. If omitted, deletes all faces for the user."
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "username"
-                ],
-                "title": "DeleteFacesRequest",
-                "description": "Request to delete enrolled face records."
-            },
-            "DeleteFacesResponse": {
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "title": "Status",
-                        "default": "ok"
-                    },
-                    "deleted_count": {
-                        "type": "integer",
-                        "title": "Deleted Count",
-                        "default": 0
-                    }
-                },
-                "type": "object",
-                "title": "DeleteFacesResponse",
-                "description": "Response for the delete_faces endpoint."
-            },
-            "FaceRecord": {
-                "properties": {
-                    "s3_key": {
-                        "type": "string",
-                        "title": "S3 Key"
-                    },
-                    "username": {
-                        "type": "string",
-                        "title": "Username"
-                    },
-                    "embedding": {
-                        "items": {
-                            "type": "number"
-                        },
-                        "type": "array",
-                        "title": "Embedding"
-                    },
-                    "device_id": {
-                        "type": "string",
-                        "title": "Device Id"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "s3_key",
-                    "username",
-                    "embedding",
-                    "device_id"
-                ],
-                "title": "FaceRecord",
-                "description": "A single enrolled face record."
-            },
-            "GetFacesRequest": {
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "title": "Username",
-                        "description": "Username whose faces to retrieve"
-                    },
-                    "device_id": {
-                        "anyOf": [
-                            {
-                                "type": "string"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
-                        "title": "Device Id",
-                        "description": "Specific device_id to retrieve. If omitted, returns all faces for the user."
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "username"
-                ],
-                "title": "GetFacesRequest",
-                "description": "Request to retrieve enrolled face records."
-            },
-            "GetFacesResponse": {
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "title": "Status",
-                        "default": "ok"
-                    },
-                    "username": {
-                        "type": "string",
-                        "title": "Username"
-                    },
-                    "faces": {
-                        "items": {
-                            "$ref": "#/components/schemas/FaceRecord"
-                        },
-                        "type": "array",
-                        "title": "Faces"
-                    },
-                    "count": {
-                        "type": "integer",
-                        "title": "Count",
-                        "default": 0
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "username"
-                ],
-                "title": "GetFacesResponse",
-                "description": "Response for the get_faces endpoint."
-            },
-            "HTTPValidationError": {
-                "properties": {
-                    "detail": {
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        },
-                        "type": "array",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "title": "HTTPValidationError"
-            },
-            "UploadResponse": {
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "title": "Status",
-                        "default": "ok"
-                    },
-                    "s3_key": {
-                        "type": "string",
-                        "title": "S3 Key",
-                        "description": "Object key in S3"
-                    },
-                    "record_count": {
-                        "type": "integer",
-                        "title": "Record Count",
-                        "description": "Number of records stored",
-                        "default": 0
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "s3_key"
-                ],
-                "title": "UploadResponse",
-                "description": "Standard success response after storing data."
-            },
-            "ValidationError": {
-                "properties": {
-                    "loc": {
-                        "items": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "integer"
-                                }
-                            ]
-                        },
-                        "type": "array",
-                        "title": "Location"
-                    },
-                    "msg": {
-                        "type": "string",
-                        "title": "Message"
-                    },
-                    "type": {
-                        "type": "string",
-                        "title": "Error Type"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "loc",
-                    "msg",
-                    "type"
-                ],
-                "title": "ValidationError"
-            },
-            "VectorRecord": {
-                "properties": {
-                    "username": {
-                        "type": "string",
-                        "title": "Username",
-                        "description": "The user identity label"
-                    },
-                    "embedding": {
-                        "items": {
-                            "type": "number"
-                        },
-                        "type": "array",
-                        "maxItems": 512,
-                        "minItems": 512,
-                        "title": "Embedding",
-                        "description": "512-dim face embedding"
-                    },
-                    "is_correct": {
-                        "type": "boolean",
-                        "title": "Is Correct",
-                        "description": "Edge feedback: was the recognition correct?",
-                        "default": true
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "username",
-                    "embedding"
-                ],
-                "title": "VectorRecord"
+    "/api/v1/gateway/get_faces": {
+      "post": {
+        "tags": ["gateway"],
+        "summary": "Get Faces",
+        "description": "Retrieve enrolled face records for a given username.\n\nIf ``device_id`` is provided, only that specific record is returned.\nOtherwise **all** face records for the user are returned.",
+        "operationId": "gateway-get_faces",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetFacesRequest"
+              }
             }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetFacesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
         }
+      }
+    },
+    "/api/v1/gateway/delete_faces": {
+      "post": {
+        "tags": ["gateway"],
+        "summary": "Delete Faces",
+        "description": "Delete enrolled face records for a user.\n\nIf ``device_id`` is provided, only that specific record is deleted.\nOtherwise **all** face records for the user are removed.",
+        "operationId": "gateway-delete_faces",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteFacesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFacesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/utils/health-check/": {
+      "get": {
+        "tags": ["utils"],
+        "summary": "Health Check",
+        "operationId": "utils-health_check",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "boolean",
+                  "title": "Response Utils-Health Check"
+                }
+              }
+            }
+          }
+        }
+      }
     }
+  },
+  "components": {
+    "schemas": {
+      "BatchUpload": {
+        "properties": {
+          "device_id": {
+            "type": "string",
+            "title": "Device Id",
+            "description": "Unique edge device identifier"
+          },
+          "date": {
+            "type": "string",
+            "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+            "title": "Date",
+            "description": "ISO-8601 date string (YYYY-MM-DD)"
+          },
+          "vectors": {
+            "items": {
+              "$ref": "#/components/schemas/VectorRecord"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Vectors",
+            "description": "Batch of face-embedding records"
+          }
+        },
+        "type": "object",
+        "required": ["device_id", "date", "vectors"],
+        "title": "BatchUpload",
+        "description": "Daily batch payload sent from an Edge device."
+      },
+      "CreateFacesRequest": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 512,
+            "minItems": 512,
+            "title": "Embedding"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id",
+            "description": "Source device or 'manual'",
+            "default": "manual"
+          }
+        },
+        "type": "object",
+        "required": ["username", "embedding"],
+        "title": "CreateFacesRequest",
+        "description": "Request to create (enroll) a baseline face vector."
+      },
+      "DeleteFacesRequest": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username",
+            "description": "Username whose faces to delete"
+          },
+          "device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Id",
+            "description": "Specific device_id to delete. If omitted, deletes all faces for the user."
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "DeleteFacesRequest",
+        "description": "Request to delete enrolled face records."
+      },
+      "DeleteFacesResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "ok"
+          },
+          "deleted_count": {
+            "type": "integer",
+            "title": "Deleted Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "DeleteFacesResponse",
+        "description": "Response for the delete_faces endpoint."
+      },
+      "FaceRecord": {
+        "properties": {
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "title": "Embedding"
+          },
+          "device_id": {
+            "type": "string",
+            "title": "Device Id"
+          }
+        },
+        "type": "object",
+        "required": ["s3_key", "username", "embedding", "device_id"],
+        "title": "FaceRecord",
+        "description": "A single enrolled face record."
+      },
+      "GetFacesRequest": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username",
+            "description": "Username whose faces to retrieve"
+          },
+          "device_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Device Id",
+            "description": "Specific device_id to retrieve. If omitted, returns all faces for the user."
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "GetFacesRequest",
+        "description": "Request to retrieve enrolled face records."
+      },
+      "GetFacesResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "ok"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          },
+          "faces": {
+            "items": {
+              "$ref": "#/components/schemas/FaceRecord"
+            },
+            "type": "array",
+            "title": "Faces"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": ["username"],
+        "title": "GetFacesResponse",
+        "description": "Response for the get_faces endpoint."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "UploadResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "default": "ok"
+          },
+          "s3_key": {
+            "type": "string",
+            "title": "S3 Key",
+            "description": "Object key in S3"
+          },
+          "record_count": {
+            "type": "integer",
+            "title": "Record Count",
+            "description": "Number of records stored",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": ["s3_key"],
+        "title": "UploadResponse",
+        "description": "Standard success response after storing data."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
+      },
+      "VectorRecord": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username",
+            "description": "The user identity label"
+          },
+          "embedding": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array",
+            "maxItems": 512,
+            "minItems": 512,
+            "title": "Embedding",
+            "description": "512-dim face embedding"
+          },
+          "is_correct": {
+            "type": "boolean",
+            "title": "Is Correct",
+            "description": "Edge feedback: was the recognition correct?",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": ["username", "embedding"],
+        "title": "VectorRecord"
+      }
+    }
+  }
 }

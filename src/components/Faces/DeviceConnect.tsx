@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Cpu, ArrowRight, Coffee } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router"
+import { ArrowRight, Coffee, Cpu } from "lucide-react"
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 export default function DeviceConnect() {
-  const [deviceId, setDeviceId] = useState("");
-  const navigate = useNavigate();
+  const [deviceId, setDeviceId] = useState("")
+  const navigate = useNavigate()
 
   const handleSubmit = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    if (!deviceId.trim()) return;
-    navigate({ to: "/faces", search: { device_id: deviceId.trim() } });
-  };
+    e.preventDefault()
+    if (!deviceId.trim()) return
+    navigate({ to: "/faces", search: { device_id: deviceId.trim() } })
+  }
 
   return (
     <div className="flex min-h-[85vh] flex-col items-center justify-center px-4">
@@ -79,5 +79,5 @@ export default function DeviceConnect() {
         CogniBrew Edge Gateway v0.1.0
       </p>
     </div>
-  );
+  )
 }
