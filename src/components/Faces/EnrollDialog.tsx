@@ -30,6 +30,8 @@ export default function EnrollDialog({
   const fileRef = useRef<HTMLInputElement>(null)
   const enrollMutation = useEnrollFace(device_id)
 
+  const actualUsername = enrollUsername || username
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -42,15 +44,15 @@ export default function EnrollDialog({
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault()
     const file = fileRef.current?.files?.[0]
-    if (!file || !username.trim()) return
+    if (!file || !actualUsername.trim()) return
 
     try {
       await enrollMutation.mutateAsync({
         file,
-        enrollUsername: username.trim(),
+        enrollUsername: actualUsername.trim(),
       })
       toast.success("Face enrolled", {
-        description: `Successfully enrolled face for ${username.trim()} on device ${device_id}`,
+        description: `Successfully enrolled face for ${actualUsername.trim()} on device ${device_id}`,
       })
       setOpen(false)
       resetForm()
@@ -62,7 +64,7 @@ export default function EnrollDialog({
   }
 
   const resetForm = () => {
-    setUsername("")
+    if (!enrollUsername) setUsername("")
     setPreview(null)
     if (fileRef.current) fileRef.current.value = ""
   }
@@ -97,19 +99,21 @@ export default function EnrollDialog({
 
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Username */}
-          <div className="space-y-2">
-            <Label htmlFor="enroll-username">Username</Label>
-            <Input
-              id="enroll-username"
-              placeholder="e.g. john_doe"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-            <p className="text-xs text-muted-foreground">
-              The identity label for this face record.
-            </p>
-          </div>
+          {!enrollUsername ? (
+            <div className="space-y-2">
+              <Label htmlFor="enroll-username">Username</Label>
+              <Input
+                id="enroll-username"
+                placeholder="e.g. john_doe"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                The identity label for this face record.
+              </p>
+            </div>
+          ) : null}
 
           {/* File upload */}
           <div className="space-y-2">
@@ -141,7 +145,7 @@ export default function EnrollDialog({
           <DialogFooter>
             <Button
               type="submit"
-              disabled={enrollMutation.isPending || !username.trim()}
+              disabled={enrollMutation.isPending || !actualUsername.trim()}
               className="w-full gap-2 sm:w-auto"
             >
               {enrollMutation.isPending ? (
