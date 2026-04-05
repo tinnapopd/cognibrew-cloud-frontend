@@ -10,6 +10,7 @@ export function useGetFaces(username: string, device_id: string) {
     queryKey: ["faces", username, device_id],
     queryFn: () => getFaces(username, device_id),
     enabled: !!username && !!device_id,
+    refetchInterval: 5000,
   })
 }
 
@@ -19,6 +20,7 @@ export function useGetFacesByDevice(device_id: string) {
     queryKey: ["faces-by-device", device_id],
     queryFn: () => getFaces(undefined, device_id),
     enabled: !!device_id,
+    refetchInterval: 5000,
   })
 }
 

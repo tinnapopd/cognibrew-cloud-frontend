@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router"
-import { AlertCircle, ArrowLeft, Cpu, RefreshCw, UserPlus } from "lucide-react"
+import { AlertCircle, ArrowLeft, Cpu, UserPlus } from "lucide-react"
 import { toast } from "sonner"
 import EnrollDialog from "@/components/Faces/EnrollDialog"
 import FaceCard from "@/components/Faces/FaceCard"
@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_layout/faces")({
 function FacesPage() {
   const { username, device_id } = Route.useSearch()
   const navigate = useNavigate()
-  const { data, isLoading, isError, error, refetch, isFetching } = useGetFaces(
+  const { data, isLoading, isError, error, refetch } = useGetFaces(
     username,
     device_id,
   )
@@ -77,18 +77,6 @@ function FacesPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            disabled={isFetching}
-            className="gap-1.5"
-          >
-            <RefreshCw
-              className={`h-3.5 w-3.5 ${isFetching ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
           <EnrollDialog device_id={device_id} enrollUsername={username} />
         </div>
       </div>
