@@ -18,7 +18,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 interface FaceCardProps {
   face: FaceRecord
-  onDelete: (username: string) => void
+  onDelete: (s3_key: string) => void
   isDeleting: boolean
 }
 
@@ -111,7 +111,7 @@ export default function FaceCard({
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={() => onDelete(face.username)}
+                onClick={() => onDelete(face.s3_key)}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
                 Delete

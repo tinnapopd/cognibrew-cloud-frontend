@@ -39,7 +39,7 @@ export async function createFace(body: CreateFacesRequest) {
 }
 
 export async function deleteFace(
-  body: DeleteFacesRequest,
+  body: DeleteFacesRequest & { s3_key?: string },
 ): Promise<DeleteFacesResponse> {
   return gatewayPost<DeleteFacesResponse>("/api/v1/gateway/delete_faces", body)
 }

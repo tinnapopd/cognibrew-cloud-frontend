@@ -4,12 +4,12 @@ import { createFace, deleteFace, embedImage, getFaces } from "@/lib/api"
 
 // ── Queries ────────────────────────────────────────────────────────────────
 
-/** Get faces by username (optionally filtered by device_id). */
-export function useGetFaces(username: string, device_id?: string) {
+/** Get faces by username and device_id. */
+export function useGetFaces(username: string, device_id: string) {
   return useQuery({
     queryKey: ["faces", username, device_id],
     queryFn: () => getFaces(username, device_id),
-    enabled: !!username,
+    enabled: !!username && !!device_id,
   })
 }
 
@@ -43,7 +43,7 @@ export function useEnrollFace(device_id: string, username?: string) {
       const body: CreateFacesRequest = {
         username: enrollUsername,
         embedding: embedding as CreateFacesRequest["embedding"], // 512-tuple
-        device_id: device_id || "manual",
+        device_id: device_id,
       }
       return createFace(body)
     },
@@ -56,20 +56,16 @@ export function useEnrollFace(device_id: string, username?: string) {
   })
 }
 
-/** Delete a face record (by username + optional device_id). */
-export function useDeleteFace(username?: string, device_id?: string) {
+/** Delete a face record (by username + optional device_id + s3_key). */
+export function useDeleteFace(username: string, device_id: string) {
   const qc = useQueryClient()
 
   return useMutation({
-    mutationFn: (deleteUsername: string) =>
-      deleteFace({ username: deleteUsername, device_id }),
+    mutationFn: (s3_key: string) =>
+      deleteFace({ username, device_id, s3_key }),
     onSuccess: () => {
-      if (device_id) {
-        qc.invalidateQueries({ queryKey: ["faces-by-device", device_id] })
-      }
-      if (username) {
-        qc.invalidateQueries({ queryKey: ["faces", username] })
-      }
+      qc.invalidateQueries({ queryKey: ["faces-by-device", device_id] })
+      qc.invalidateQueries({ queryKey: ["faces", username] })
     },
   })
 }

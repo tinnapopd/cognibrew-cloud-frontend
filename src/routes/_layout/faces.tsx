@@ -10,13 +10,13 @@ import { useDeleteFace, useGetFaces } from "@/hooks/useFaces"
 
 interface FacesSearch {
   username: string
-  device_id?: string
+  device_id: string
 }
 
 export const Route = createFileRoute("/_layout/faces")({
   validateSearch: (search: Record<string, unknown>): FacesSearch => ({
     username: (search.username as string) || "",
-    device_id: (search.device_id as string) || undefined,
+    device_id: (search.device_id as string) || "",
   }),
   component: FacesPage,
 })
@@ -30,16 +30,16 @@ function FacesPage() {
   )
   const deleteMutation = useDeleteFace(username, device_id)
 
-  if (!username) {
+  if (!username || !device_id) {
     navigate({ to: "/" })
     return null
   }
 
-  const handleDelete = async (targetUsername: string) => {
+  const handleDelete = async (s3_key: string) => {
     try {
-      await deleteMutation.mutateAsync(targetUsername)
+      await deleteMutation.mutateAsync(s3_key)
       toast.success("Face deleted", {
-        description: `Removed face for ${targetUsername}${device_id ? ` from device ${device_id}` : ""}`,
+        description: `Removed specific face for ${username} from device ${device_id}`,
       })
     } catch (err) {
       toast.error("Delete failed", {
@@ -90,7 +90,7 @@ function FacesPage() {
             Refresh
           </Button>
           <EnrollDialog
-            device_id={device_id || "manual"}
+            device_id={device_id}
             enrollUsername={username}
           />
         </div>
@@ -134,15 +134,15 @@ function FacesPage() {
             <p className="text-lg font-medium">
               No faces found for{" "}
               <span className="text-primary">{username}</span>
-              {device_id && ` on device ${device_id}`}
+              {` on device ${device_id}`}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               Would you like to enroll a new face?
             </p>
           </div>
-          {/* Default to the chosen device_id or 'manual' */}
+          {/* Default to the chosen device_id */}
           <EnrollDialog
-            device_id={device_id || "manual"}
+            device_id={device_id}
             enrollUsername={username}
           />
         </div>

@@ -12,12 +12,12 @@ export default function DeviceConnect() {
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault()
-    if (!username.trim()) return
+    if (!username.trim() || !deviceId.trim()) return
     navigate({
       to: "/faces",
       search: {
         username: username.trim(),
-        device_id: deviceId.trim() || undefined,
+        device_id: deviceId.trim(),
       },
     })
   }
@@ -37,7 +37,7 @@ export default function DeviceConnect() {
           Cognibrew Edge
         </h1>
         <p className="max-w-sm text-muted-foreground">
-          Face Recognition Management Console — Enter a Username to view &amp;
+          Face Recognition Management Console — Enter a Username and Device ID to view &amp;
           manage enrolled faces.
         </p>
       </div>
@@ -70,9 +70,10 @@ export default function DeviceConnect() {
           <div className="space-y-2">
             <Label
               htmlFor="device-id"
-              className="flex items-center gap-2 text-sm font-medium text-muted-foreground"
+              className="flex items-center gap-2 text-sm font-medium"
             >
-              Device ID (Optional)
+              <Cpu className="h-4 w-4 text-primary" />
+              Device ID (Required)
             </Label>
             <Input
               id="device-id"
@@ -81,6 +82,7 @@ export default function DeviceConnect() {
               value={deviceId}
               onChange={(e) => setDeviceId(e.target.value)}
               className="h-12 text-base"
+              required
             />
           </div>
         </div>
